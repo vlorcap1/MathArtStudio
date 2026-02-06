@@ -1443,4 +1443,1449 @@ function stat(m) {
 init();
 </script>
 </body>
+</html><!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MathArt Studio - Inspirado en Hamid Naderi Yeganeh</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg: #060610;
+            --bg-card: #0c0c1a;
+            --bg-input: #12122a;
+            --bg-hover: #1a1a3a;
+            --accent: #818cf8;
+            --accent-dim: rgba(129,140,248,0.15);
+            --green: #4ade80;
+            --green-dim: rgba(74,222,128,0.15);
+            --orange: #fb923c;
+            --orange-dim: rgba(251,146,60,0.15);
+            --pink: #f472b6;
+            --cyan: #22d3ee;
+            --red: #f87171;
+            --text: #f1f5f9;
+            --text-mid: #94a3b8;
+            --text-dim: #64748b;
+            --border: #1e1e40;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .app {
+            display: grid;
+            grid-template-rows: 52px 1fr 40px;
+            grid-template-columns: 1fr 380px;
+            grid-template-areas:
+                "header header"
+                "main sidebar"
+                "footer footer";
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        header {
+            grid-area: header;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo { display: flex; align-items: center; gap: 10px; }
+        .logo-icon {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; color: white;
+        }
+        .logo-text { font-weight: 600; font-size: 1rem; }
+
+        .nav-tabs { display: flex; background: var(--bg-input); padding: 3px; border-radius: 8px; }
+        .nav-tab {
+            padding: 7px 20px; background: none; border: none;
+            color: var(--text-dim); font-size: 0.82rem; font-weight: 500;
+            border-radius: 6px; cursor: pointer; transition: all 0.2s;
+        }
+        .nav-tab:hover { color: var(--text); }
+        .nav-tab.active { background: var(--accent); color: white; }
+
+        .header-btns { display: flex; gap: 6px; }
+        .icon-btn {
+            width: 34px; height: 34px; border-radius: 8px;
+            border: 1px solid var(--border); background: var(--bg-input);
+            color: var(--text-mid); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+        .main-area {
+            grid-area: main;
+            background: linear-gradient(180deg, var(--bg) 0%, #080812 100%);
+            display: flex; flex-direction: column; position: relative;
+        }
+
+        .canvas-wrap {
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            padding: 16px; min-height: 0;
+        }
+
+        #mainCanvas {
+            max-width: 100%; max-height: 100%;
+            border-radius: 12px;
+            box-shadow: 0 0 80px rgba(99,102,241,0.08);
+        }
+
+        .toolbar {
+            position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 4px; padding: 6px 10px;
+            background: rgba(12,12,26,0.95); backdrop-filter: blur(10px);
+            border: 1px solid var(--border); border-radius: 10px;
+        }
+
+        .tool-btn {
+            padding: 6px 12px; background: transparent; border: none; border-radius: 5px;
+            color: var(--text-mid); font-size: 0.75rem; cursor: pointer;
+            display: flex; align-items: center; gap: 4px; transition: all 0.15s;
+        }
+        .tool-btn:hover { background: var(--bg-hover); color: var(--text); }
+        .tool-btn.active { background: var(--accent); color: white; }
+
+        .tool-sep { width: 1px; background: var(--border); margin: 4px; }
+
+        .tool-slider {
+            display: flex; align-items: center; gap: 5px;
+            padding: 0 8px; font-size: 0.72rem; color: var(--text-dim);
+        }
+        .tool-slider input {
+            width: 60px; height: 3px; -webkit-appearance: none;
+            background: var(--bg-hover); border-radius: 2px;
+        }
+        .tool-slider input::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 10px; height: 10px;
+            background: var(--accent); border-radius: 50%; cursor: pointer;
+        }
+        .tool-slider .val { color: var(--accent); min-width: 28px; font-family: monospace; }
+
+        footer {
+            grid-area: footer;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border); 
+            padding: 0 16px;
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
+            font-size: 0.72rem; 
+            color: var(--text-dim);
+        }
+        footer a { color: var(--accent); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+
+        .side-panel {
+            grid-area: sidebar;
+            background: var(--bg-card); border-left: 1px solid var(--border);
+            display: flex; flex-direction: column;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        .panel-scroll { 
+            flex: 1; 
+            overflow-y: auto; 
+            overflow-x: hidden;
+            padding: 14px; 
+            min-height: 0;
+        }
+        .panel-scroll::-webkit-scrollbar { width: 6px; }
+        .panel-scroll::-webkit-scrollbar-track { background: var(--bg); }
+        .panel-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        .panel-scroll::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+        .panel-footer {
+            padding: 10px 14px; background: var(--bg);
+            border-top: 1px solid var(--border); display: flex; gap: 8px;
+        }
+
+        .view { display: none; }
+        .view.active { display: block; }
+
+        .section { margin-bottom: 16px; }
+        .section-title {
+            font-size: 0.68rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.08em; color: var(--text-dim); margin-bottom: 10px;
+        }
+
+        .card { background: var(--bg-input); border-radius: 10px; padding: 14px; }
+
+        .btn {
+            padding: 10px 16px; border-radius: 8px; border: none;
+            font-size: 0.82rem; font-weight: 500; cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            transition: all 0.15s;
+        }
+        .btn-primary { background: var(--accent); color: white; flex: 1; }
+        .btn-primary:hover { background: #6366f1; }
+        .btn-secondary { background: var(--bg-input); color: var(--text); border: 1px solid var(--border); flex: 1; }
+        .btn-secondary:hover { border-color: var(--accent); }
+        .btn-sm { padding: 6px 12px; font-size: 0.75rem; }
+
+        /* Learn View */
+        .progress-box {
+            background: var(--bg-input); border-radius: 10px;
+            padding: 12px; margin-bottom: 14px;
+        }
+        .progress-head { display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 8px; }
+        .progress-track { height: 5px; background: var(--bg); border-radius: 3px; margin-bottom: 10px; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--green), var(--cyan)); border-radius: 3px; transition: width 0.3s; }
+
+        .lesson-dots { display: flex; gap: 4px; }
+        .lesson-dot {
+            flex: 1; height: 28px; background: var(--bg); border: 2px solid var(--border);
+            border-radius: 6px; font-size: 0.72rem; color: var(--text-dim);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .lesson-dot:hover { border-color: var(--accent); }
+        .lesson-dot.done { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+        .lesson-dot.now { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+        .lesson-card { background: var(--bg-input); border-radius: 12px; overflow: hidden; }
+        .lesson-head { padding: 14px; display: flex; gap: 12px; background: var(--bg-hover); }
+        .lesson-icon {
+            width: 42px; height: 42px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
+        }
+        .lesson-icon.blue { background: linear-gradient(135deg, #3b82f6, #6366f1); }
+        .lesson-icon.orange { background: linear-gradient(135deg, #f97316, #fb923c); }
+        .lesson-icon.green { background: linear-gradient(135deg, #22c55e, #4ade80); }
+        .lesson-icon.pink { background: linear-gradient(135deg, #ec4899, #f472b6); }
+        .lesson-icon.cyan { background: linear-gradient(135deg, #06b6d4, #22d3ee); }
+
+        .lesson-info h3 { font-size: 0.95rem; margin-bottom: 3px; }
+        .lesson-info p { font-size: 0.75rem; color: var(--text-dim); }
+
+        .lesson-body { padding: 14px; }
+        .lesson-text { font-size: 0.85rem; color: var(--text-mid); line-height: 1.7; }
+        .lesson-text p { margin-bottom: 10px; }
+        .lesson-text strong { color: var(--text); }
+        .lesson-text .hl { color: var(--accent); }
+        .lesson-text .hl-o { color: var(--orange); }
+        .lesson-text .hl-c { color: var(--cyan); }
+        .lesson-text .hl-g { color: var(--green); }
+
+        .math-box {
+            background: var(--bg); border-left: 3px solid var(--accent);
+            border-radius: 8px; padding: 14px; margin: 14px 0;
+            text-align: center; overflow-x: auto;
+        }
+
+        .demo-box { background: var(--bg); border-radius: 8px; padding: 12px; margin-top: 14px; }
+        .demo-label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 8px; }
+        .demo-canvas { width: 100%; height: 90px; background: var(--bg-card); border-radius: 6px; display: block; margin-bottom: 10px; }
+        .demo-ctrl { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; }
+        .demo-ctrl label { color: var(--text-mid); min-width: 28px; }
+        .demo-ctrl input { flex: 1; height: 4px; -webkit-appearance: none; background: var(--bg-input); border-radius: 2px; }
+        .demo-ctrl input::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: var(--accent); border-radius: 50%; cursor: pointer; }
+        .demo-ctrl .val { color: var(--accent); min-width: 36px; text-align: right; font-family: monospace; }
+
+        .quiz-box { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-top: 14px; }
+        .quiz-label { font-size: 0.68rem; text-transform: uppercase; color: var(--text-dim); margin-bottom: 10px; }
+        .quiz-q { font-size: 0.88rem; font-weight: 500; margin-bottom: 12px; line-height: 1.5; }
+        .quiz-opts { display: flex; flex-direction: column; gap: 6px; }
+        .quiz-opt {
+            padding: 10px 12px; background: var(--bg-input); border: 2px solid var(--border);
+            border-radius: 8px; font-size: 0.82rem; cursor: pointer; text-align: left;
+            color: var(--text); display: flex; align-items: center; gap: 10px; transition: all 0.15s;
+        }
+        .quiz-opt:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-dim); }
+        .quiz-opt .ltr {
+            width: 22px; height: 22px; background: var(--bg); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 600; font-size: 0.75rem;
+        }
+        .quiz-opt.ok { background: var(--green-dim) !important; border-color: var(--green) !important; color: var(--green) !important; }
+        .quiz-opt.ok .ltr { background: var(--green); color: #000; }
+        .quiz-opt.no { background: rgba(248,113,113,0.12) !important; border-color: var(--red) !important; color: var(--red) !important; }
+        .quiz-opt.no .ltr { background: var(--red); color: #000; }
+        .quiz-opt:disabled { cursor: default; }
+
+        .quiz-fb { margin-top: 12px; padding: 12px; border-radius: 8px; font-size: 0.82rem; line-height: 1.5; display: none; }
+        .quiz-fb.show { display: block; }
+        .quiz-fb.ok { background: var(--green-dim); color: #86efac; }
+        .quiz-fb.no { background: rgba(248,113,113,0.1); color: #fca5a5; }
+
+        .lesson-btns { padding: 12px 14px; border-top: 1px solid var(--border); display: flex; gap: 8px; }
+
+        /* Create View */
+        .editor { background: var(--bg-input); border-radius: 10px; overflow: hidden; }
+        .ed-tabs { display: flex; background: var(--bg); padding: 3px; margin: 10px; border-radius: 6px; }
+        .ed-tab { flex: 1; padding: 7px; background: none; border: none; color: var(--text-dim); font-size: 0.75rem; border-radius: 5px; cursor: pointer; }
+        .ed-tab:hover { color: var(--text); }
+        .ed-tab.active { background: var(--accent); color: white; }
+        .ed-body { padding: 0 10px 10px; }
+
+        .eq-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .eq-lbl { font-size: 0.95rem; font-weight: 600; color: var(--cyan); min-width: 48px; font-family: serif; }
+        .eq-inp { flex: 1; padding: 9px 11px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: monospace; font-size: 0.8rem; }
+        .eq-inp:focus { outline: none; border-color: var(--accent); }
+
+        .fn-pal { display: flex; flex-wrap: wrap; gap: 4px; padding: 10px; background: var(--bg); border-radius: 6px; margin-top: 8px; }
+        .fn-btn { padding: 5px 9px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 5px; color: var(--text-mid); font-family: monospace; font-size: 0.72rem; cursor: pointer; }
+        .fn-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .fn-btn.t { border-left: 2px solid var(--orange); }
+        .fn-btn.m { border-left: 2px solid var(--cyan); }
+        .fn-btn.v { border-left: 2px solid var(--green); }
+
+        .par-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .par-item { background: var(--bg); border-radius: 6px; padding: 10px; }
+        .par-head { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.82rem; }
+        .par-val { font-family: monospace; color: var(--accent); }
+        .par-sld { width: 100%; height: 4px; -webkit-appearance: none; background: var(--bg-input); border-radius: 2px; }
+        .par-sld::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: var(--accent); border-radius: 50%; cursor: pointer; }
+
+        .sty-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+        .sty-item { background: var(--bg); border: 2px solid transparent; border-radius: 8px; padding: 10px 4px; text-align: center; cursor: pointer; }
+        .sty-item:hover { border-color: var(--border); }
+        .sty-item.active { border-color: var(--accent); background: var(--accent-dim); }
+        .sty-item .ico { font-size: 1.1rem; margin-bottom: 3px; }
+        .sty-item .lbl { font-size: 0.65rem; color: var(--text-dim); }
+
+        .clr-row { display: flex; gap: 10px; margin-top: 10px; }
+        .clr-item { flex: 1; }
+        .clr-item label { display: block; font-size: 0.7rem; color: var(--text-dim); margin-bottom: 4px; }
+        .clr-item input { width: 100%; height: 34px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); cursor: pointer; }
+
+        .eq-err { background: rgba(248,113,113,0.1); border: 1px solid var(--red); border-radius: 6px; padding: 8px; font-size: 0.78rem; color: var(--red); margin-top: 8px; display: none; }
+        .eq-err.show { display: block; }
+
+        /* Explore View */
+        .search-row { margin-bottom: 12px; }
+        .search-inp { width: 100%; padding: 10px 12px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.82rem; }
+        .search-inp:focus { outline: none; border-color: var(--accent); }
+
+        .cat-tabs { display: flex; gap: 5px; margin-bottom: 12px; }
+        .cat-tab { padding: 6px 12px; background: var(--bg-input); border: none; color: var(--text-dim); font-size: 0.72rem; border-radius: 16px; cursor: pointer; }
+        .cat-tab:hover { color: var(--text); }
+        .cat-tab.active { background: var(--accent); color: white; }
+
+        .gal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .gal-item { background: var(--bg-input); border-radius: 10px; overflow: hidden; cursor: pointer; border: 2px solid transparent; transition: all 0.15s; }
+        .gal-item:hover { border-color: var(--accent); transform: translateY(-2px); }
+        .gal-item.active { border-color: var(--green); }
+        .gal-thumb { aspect-ratio: 1; background: var(--bg); }
+        .gal-thumb canvas { width: 100%; height: 100%; display: block; }
+        .gal-info { padding: 8px 10px; }
+        .gal-name { font-size: 0.78rem; font-weight: 500; margin-bottom: 2px; }
+        .gal-meta { font-size: 0.68rem; color: var(--text-dim); }
+
+        .exp-box { background: var(--orange-dim); border: 1px solid rgba(251,146,60,0.3); border-radius: 10px; padding: 14px; margin-top: 14px; }
+        .exp-title { font-size: 0.88rem; font-weight: 600; margin-bottom: 6px; }
+        .exp-desc { font-size: 0.78rem; color: var(--text-mid); margin-bottom: 10px; line-height: 1.5; }
+        .exp-btns { display: flex; gap: 6px; }
+
+        .rnd-res { background: var(--bg); border-radius: 6px; padding: 10px; margin-top: 10px; font-size: 0.78rem; display: none; }
+        .rnd-res.show { display: block; }
+        .rnd-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid var(--border); }
+        .rnd-row:last-child { border: none; }
+        .rnd-row .n { color: var(--text-dim); }
+        .rnd-row .v { font-family: monospace; color: var(--cyan); font-size: 0.72rem; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.25s ease; }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">∿</div>
+                <span class="logo-text">MathArt Studio</span>
+            </div>
+            <nav class="nav-tabs">
+                <button class="nav-tab active" onclick="switchView('learn')">📚 Aprender</button>
+                <button class="nav-tab" onclick="switchView('create')">🎨 Crear</button>
+                <button class="nav-tab" onclick="switchView('explore')">🔬 Explorar</button>
+            </nav>
+            <div class="header-btns">
+                <button class="icon-btn" onclick="resetAll()" title="Reiniciar">↺</button>
+                <button class="icon-btn" onclick="exportPNG()" title="Guardar">💾</button>
+            </div>
+        </header>
+
+        <main class="main-area">
+            <div class="canvas-wrap">
+                <canvas id="mainCanvas" width="700" height="700"></canvas>
+            </div>
+            <div class="toolbar">
+                <div class="tool-slider">
+                    <span>n:</span>
+                    <input type="range" id="ctrl-n" min="100" max="2000" value="500" oninput="setN(this.value)">
+                    <span class="val" id="val-n">500</span>
+                </div>
+                <div class="tool-sep"></div>
+                <button class="tool-btn" id="btn-anim" onclick="toggleAnim()">▶ Animar</button>
+                <button class="tool-btn" id="btn-guide" onclick="toggleGuide()">📐</button>
+                <button class="tool-btn" id="btn-rainbow" onclick="toggleRainbow()">🌈</button>
+                <button class="tool-btn" id="btn-build" onclick="toggleBuild()">🔨 Construir</button>
+            </div>
+        </main>
+
+        <aside class="side-panel">
+            <div class="panel-scroll">
+                <!-- Learn View -->
+                <div class="view active" id="view-learn">
+                    <div class="progress-box">
+                        <div class="progress-head">
+                            <span style="color:var(--text-mid)">Tu progreso</span>
+                            <span style="color:var(--green)" id="prog-txt">Lección 1/5</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill" id="prog-fill" style="width:20%"></div>
+                        </div>
+                        <div class="lesson-dots" id="lesson-dots"></div>
+                    </div>
+                    <div id="lesson-content"></div>
+                </div>
+
+                <!-- Create View -->
+                <div class="view" id="view-create">
+                    <div class="section">
+                        <div class="section-title">✏️ Editor</div>
+                        <div class="editor">
+                            <div class="ed-tabs">
+                                <button class="ed-tab active" onclick="setMode('param')">Paramétrica</button>
+                                <button class="ed-tab" onclick="setMode('polar')">Polar</button>
+                                <button class="ed-tab" onclick="setMode('lines')">Líneas</button>
+                            </div>
+                            <div class="ed-body">
+                                <div id="ed-param">
+                                    <div class="eq-row"><span class="eq-lbl">X(t) =</span><input class="eq-inp" id="eq-x" value="sin(a*t)*cos(b*t)"></div>
+                                    <div class="eq-row"><span class="eq-lbl">Y(t) =</span><input class="eq-inp" id="eq-y" value="sin(a*t)*sin(b*t)"></div>
+                                </div>
+                                <div id="ed-polar" style="display:none">
+                                    <div class="eq-row"><span class="eq-lbl">r(θ) =</span><input class="eq-inp" id="eq-r" value="cos(k*theta)"></div>
+                                </div>
+                                <div id="ed-lines" style="display:none">
+                                    <div class="eq-row"><span class="eq-lbl">X₁ =</span><input class="eq-inp" id="eq-x1" value="sin(2*PI*t+PI/3)^7*1.5"></div>
+                                    <div class="eq-row"><span class="eq-lbl">Y₁ =</span><input class="eq-inp" id="eq-y1" value="cos(6*PI*t)^2*0.25"></div>
+                                    <div class="eq-row"><span class="eq-lbl">X₂ =</span><input class="eq-inp" id="eq-x2" value="sin(6*PI*t+PI/5)*0.2"></div>
+                                    <div class="eq-row"><span class="eq-lbl">Y₂ =</span><input class="eq-inp" id="eq-y2" value="-sin(2*PI*t-PI/3)^2*0.67"></div>
+                                </div>
+                                <div class="eq-err" id="eq-err"></div>
+                                <div class="fn-pal">
+                                    <button class="fn-btn t" onclick="ins('sin()')">sin</button>
+                                    <button class="fn-btn t" onclick="ins('cos()')">cos</button>
+                                    <button class="fn-btn m" onclick="ins('^2')">x²</button>
+                                    <button class="fn-btn m" onclick="ins('^7')">x⁷</button>
+                                    <button class="fn-btn m" onclick="ins('sqrt()')">√</button>
+                                    <button class="fn-btn m" onclick="ins('abs()')">|x|</button>
+                                    <button class="fn-btn v" onclick="ins('PI')">π</button>
+                                    <button class="fn-btn v" onclick="ins('t')">t</button>
+                                    <button class="fn-btn v" onclick="ins('a')">a</button>
+                                    <button class="fn-btn v" onclick="ins('b')">b</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section">
+                        <div class="section-title">🎛️ Parámetros</div>
+                        <div class="card">
+                            <div class="par-grid">
+                                <div class="par-item">
+                                    <div class="par-head"><span>a</span><span class="par-val" id="pv-a">3</span></div>
+                                    <input type="range" class="par-sld" min="1" max="20" step="0.5" value="3" oninput="setPar('a',this.value)">
+                                </div>
+                                <div class="par-item">
+                                    <div class="par-head"><span>b</span><span class="par-val" id="pv-b">5</span></div>
+                                    <input type="range" class="par-sld" min="1" max="20" step="0.5" value="5" oninput="setPar('b',this.value)">
+                                </div>
+                                <div class="par-item">
+                                    <div class="par-head"><span>k</span><span class="par-val" id="pv-k">6</span></div>
+                                    <input type="range" class="par-sld" min="1" max="12" value="6" oninput="setPar('k',this.value)">
+                                </div>
+                                <div class="par-item">
+                                    <div class="par-head"><span>amp</span><span class="par-val" id="pv-amp">1</span></div>
+                                    <input type="range" class="par-sld" min="0.1" max="2" step="0.1" value="1" oninput="setPar('amp',this.value)">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section">
+                        <div class="section-title">🎨 Estilo</div>
+                        <div class="card">
+                            <div class="sty-grid">
+                                <div class="sty-item active" onclick="setSty('dots',this)"><div class="ico">●●</div><div class="lbl">Puntos</div></div>
+                                <div class="sty-item" onclick="setSty('line',this)"><div class="ico">〰</div><div class="lbl">Curva</div></div>
+                                <div class="sty-item" onclick="setSty('seg',this)"><div class="ico">╱╲</div><div class="lbl">Trazos</div></div>
+                                <div class="sty-item" onclick="setSty('circ',this)"><div class="ico">◯</div><div class="lbl">Anillos</div></div>
+                            </div>
+                            <div class="clr-row">
+                                <div class="clr-item"><label>Color</label><input type="color" id="clr-stroke" value="#818cf8" onchange="updClr()"></div>
+                                <div class="clr-item"><label>Fondo</label><input type="color" id="clr-bg" value="#060610" onchange="updClr()"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Explore View -->
+                <div class="view" id="view-explore">
+                    <div class="search-row">
+                        <input type="text" class="search-inp" placeholder="🔍 Buscar..." oninput="filterGal(this.value)">
+                    </div>
+                    <div class="cat-tabs">
+                        <button class="cat-tab active" onclick="setCat('all',this)">Todas</button>
+                        <button class="cat-tab" onclick="setCat('yeganeh',this)">Yeganeh</button>
+                        <button class="cat-tab" onclick="setCat('nature',this)">Naturaleza</button>
+                        <button class="cat-tab" onclick="setCat('geo',this)">Geométrico</button>
+                    </div>
+                    <div class="gal-grid" id="gallery"></div>
+                    <div class="exp-box">
+                        <div class="exp-title">🧪 Modo Experimental</div>
+                        <div class="exp-desc">Genera ecuaciones aleatorias. ¡Muchos descubrimientos de Yeganeh fueron accidentales!</div>
+                        <div class="exp-btns">
+                            <button class="btn btn-primary btn-sm" onclick="randomize()">🎲 Aleatorio</button>
+                            <button class="btn btn-secondary btn-sm" onclick="copyEq()">📋 Copiar</button>
+                        </div>
+                        <div class="rnd-res" id="rnd-res"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <button class="btn btn-secondary" onclick="resetCanvas()">🔄 Limpiar</button>
+                <button class="btn btn-primary" onclick="applyEq()">✨ Aplicar</button>
+            </div>
+        </aside>
+
+        <footer>
+            <span>Inspirado en <a href="https://about.me/naderiyeganeh" target="_blank">Hamid Naderi Yeganeh</a> • Matemático y artista iraní • <a href="https://twitter.com/nadaborni_yeganeh" target="_blank">Twitter</a></span>
+            <span id="status">Listo</span>
+        </footer>
+    </div>
+
+<script>
+// Canvas
+const canvas = document.getElementById('mainCanvas');
+const ctx = canvas.getContext('2d');
+let animId = null, buildId = null;
+
+// State
+const S = {
+    view: 'learn',
+    lesson: 0,
+    done: [],
+    n: 500,
+    time: 0,
+    anim: false,
+    guide: false,
+    rainbow: false,
+    building: false,
+    buildProg: 1,
+    mode: 'param',
+    style: 'dots',
+    stroke: '#818cf8',
+    bg: '#060610',
+    p: { a: 3, b: 5, k: 6, amp: 1 },
+    dp: {},
+    calc: null,
+    cat: 'all',
+    galActive: null
+};
+
+// Lessons
+const lessons = [
+    {
+        title: "El parámetro t",
+        sub: "El secreto del dibujo paramétrico",
+        icon: "📍",
+        cls: "blue",
+        txt: `<p>Imagina un lápiz que se mueve automáticamente. <strong class="hl">t</strong> es como un cronómetro que va de 0 a 1.</p>
+              <p>Las ecuaciones <strong>X(t)</strong> e <strong>Y(t)</strong> indican la posición en cada momento.</p>
+              <p>Con 500 puntos, calculamos: t=0, 0.002, 0.004... hasta t=1.</p>`,
+        math: "\\text{Punto}_i = \\left( X\\left(\\tfrac{i}{n}\\right),\\, Y\\left(\\tfrac{i}{n}\\right) \\right)",
+        demo: 't',
+        quiz: {
+            q: "Si hay 1000 puntos, ¿cuánto vale t para el punto #500?",
+            o: ["0.25", "0.5", "0.75", "500"],
+            a: 1,
+            e: "500 ÷ 1000 = 0.5, exactamente la mitad del recorrido."
+        },
+        fn: function(i, n, p) {
+            const t = p.demoT !== undefined ? p.demoT : i / n;
+            const angle = t * 2 * Math.PI;
+            return { x: Math.cos(angle) * 0.6, y: Math.sin(angle) * 0.6, type: 'dot' };
+        }
+    },
+    {
+        title: "Seno y Coseno",
+        sub: "Las ondas fundamentales",
+        icon: "〰️",
+        cls: "orange",
+        txt: `<p><strong class="hl-o">sin(t)</strong> y <strong class="hl-c">cos(t)</strong> oscilan entre -1 y 1, como olas.</p>
+              <p>Diferencia: <span class="hl-o">sin(0)=0</span> empieza en cero, <span class="hl-c">cos(0)=1</span> empieza arriba.</p>
+              <p>Combinándolos: <strong>X=cos(t), Y=sin(t)</strong> crea un círculo.</p>`,
+        math: "\\color{#fb923c}\\sin\\color{white}(0)=0 \\quad | \\quad \\color{#22d3ee}\\cos\\color{white}(0)=1",
+        demo: 'sc',
+        quiz: {
+            q: "¿Qué figura crea X=cos(t), Y=sin(t)?",
+            o: ["Una línea", "Un círculo", "Una ola", "Un cuadrado"],
+            a: 1,
+            e: "Es la definición paramétrica del círculo unitario."
+        },
+        fn: function(i, n) {
+            const t = (i / n) * 2 * Math.PI;
+            return { x: Math.cos(t) * 0.6, y: Math.sin(t) * 0.6, type: 'dot' };
+        }
+    },
+    {
+        title: "Frecuencia",
+        sub: "Controla las repeticiones",
+        icon: "🔄",
+        cls: "cyan",
+        txt: `<p>La <strong class="hl">frecuencia k</strong> multiplica: <strong>sin(k·t)</strong> oscila k veces más rápido.</p>
+              <p>En rosas polares <strong>r=cos(k·θ)</strong>:</p>
+              <p>• k impar → k pétalos &nbsp;&nbsp; • k par → 2k pétalos</p>`,
+        math: "r = \\cos(\\color{#22d3ee}k\\color{white} \\cdot \\theta)",
+        demo: 'f',
+        quiz: {
+            q: "¿Cuántos pétalos tiene r = cos(4θ)?",
+            o: ["2", "4", "8", "16"],
+            a: 2,
+            e: "k=4 es par, entonces 2×4 = 8 pétalos."
+        },
+        fn: function(i, n, p) {
+            const k = p.freq || 5;
+            const theta = (i / n) * 2 * Math.PI * k;
+            const r = Math.cos(k * theta) * 0.55;
+            return { x: Math.cos(theta) * Math.abs(r), y: Math.sin(theta) * Math.abs(r), type: 'dot' };
+        }
+    },
+    {
+        title: "Potencias",
+        sub: "De suave a puntiagudo",
+        icon: "⚡",
+        cls: "green",
+        txt: `<p>Elevar <strong>sin(t)</strong> a una potencia transforma su forma:</p>
+              <p>• <strong class="hl-g">sin²(t)</strong>: siempre positivo</p>
+              <p>• <strong class="hl-g">sin⁷(t)</strong>: picos afilados, valles planos</p>
+              <p>¡Yeganeh usa <strong>sin⁷</strong> para las alas del pájaro!</p>`,
+        math: "\\sin^{\\color{#4ade80}n}(t) \\quad n=1:\\text{suave} \\;\\; n=7:\\text{puntiagudo}",
+        demo: 'p',
+        quiz: {
+            q: "¿Por qué sin²(t) nunca es negativo?",
+            o: ["Magia", "(-1)² = 1", "Solo el 2", "Siempre positivo"],
+            a: 1,
+            e: "Cualquier número al cuadrado es positivo: (-0.5)² = 0.25"
+        },
+        fn: function(i, n, p) {
+            const pw = p.power || 1;
+            const t = (i / n) * 2 * Math.PI;
+            const val = Math.pow(Math.sin(t), pw);
+            return { x: (i / n) * 1.6 - 0.8, y: val * 0.5, type: 'dot' };
+        }
+    },
+    {
+        title: "El Pájaro de Yeganeh",
+        sub: "La obra maestra (2015)",
+        icon: "🕊️",
+        cls: "pink",
+        txt: `<p>La famosa ecuación de <strong>Hamid Naderi Yeganeh</strong>:</p>
+              <p>• <strong class="hl-g">sin⁷</strong>: alas puntiagudas</p>
+              <p>• <strong class="hl-c">frecuencia 6π</strong>: detalles de plumas</p>
+              <p>• <strong class="hl-o">fase π/3</strong>: simetría perfecta</p>
+              <p>500 líneas conectan puntos calculados matemáticamente.</p>`,
+        math: "X_1 = \\tfrac{3}{2}\\sin^{\\color{#4ade80}7}(\\color{#22d3ee}2\\pi t\\color{white} + \\color{#fb923c}\\tfrac{\\pi}{3}\\color{white})",
+        demo: 'b',
+        quiz: {
+            q: "¿Por qué usar 500 líneas en vez de 50?",
+            o: ["Tradición", "Más detalle y suavidad", "Requisito técnico", "Número aleatorio"],
+            a: 1,
+            e: "Más elementos capturan mejor las curvas y crean mayor detalle."
+        },
+        fn: function(i, n) {
+            const t = i / n;
+            const x1 = Math.pow(Math.sin(2 * Math.PI * t + Math.PI/3), 7);
+            const y1 = 0.25 * Math.pow(Math.cos(6 * Math.PI * t), 2);
+            const x2 = 0.15 * Math.sin(6 * Math.PI * t + Math.PI/5);
+            const y2 = -0.5 * Math.pow(Math.sin(2 * Math.PI * t - Math.PI/3), 2);
+            return { x1: x1, y1: y1, x2: x2, y2: y2, type: 'line' };
+        }
+    }
+];
+
+// Gallery
+const gallery = [
+    { id: 'bird', name: 'Pájaro en vuelo', cat: 'yeganeh', desc: 'Yeganeh 2015' },
+    { id: 'butterfly', name: 'Mariposa', cat: 'nature', desc: 'Curva clásica' },
+    { id: 'heart', name: 'Corazón', cat: 'geo', desc: 'Paramétrico' },
+    { id: 'rose5', name: 'Rosa 5 pétalos', cat: 'nature', desc: 'k=5' },
+    { id: 'rose8', name: 'Rosa 8 pétalos', cat: 'nature', desc: 'k=4' },
+    { id: 'spiral', name: 'Espiral', cat: 'geo', desc: 'Arquímedes' },
+    { id: 'lissajous', name: 'Lissajous', cat: 'geo', desc: '3:4' },
+    { id: 'star', name: 'Estrella', cat: 'geo', desc: 'Modulado' }
+];
+
+const galFn = {
+    bird: function(i, n) {
+        const t = i / n;
+        return {
+            x1: Math.pow(Math.sin(2*Math.PI*t + Math.PI/3), 7),
+            y1: 0.25 * Math.pow(Math.cos(6*Math.PI*t), 2),
+            x2: 0.15 * Math.sin(6*Math.PI*t + Math.PI/5),
+            y2: -0.5 * Math.pow(Math.sin(2*Math.PI*t - Math.PI/3), 2),
+            type: 'line'
+        };
+    },
+    butterfly: function(i, n) {
+        const t = (i/n) * 12 * Math.PI;
+        const r = (Math.exp(Math.cos(t)) - 2*Math.cos(4*t) + Math.pow(Math.sin(t/12), 5)) * 0.15;
+        return { x: Math.sin(t)*r, y: Math.cos(t)*r, type: 'dot' };
+    },
+    heart: function(i, n) {
+        const t = (i/n) * 2 * Math.PI;
+        return {
+            x: 16 * Math.pow(Math.sin(t), 3) / 25,
+            y: -(13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t)) / 25,
+            type: 'dot',
+            r: 2.5
+        };
+    },
+    rose5: function(i, n) {
+        const theta = (i/n) * 2 * Math.PI * 5;
+        const r = Math.cos(5 * theta) * 0.6;
+        return { x: Math.cos(theta)*r, y: Math.sin(theta)*r, type: 'dot' };
+    },
+    rose8: function(i, n) {
+        const theta = (i/n) * 2 * Math.PI * 8;
+        const r = Math.cos(4 * theta) * 0.6;
+        return { x: Math.cos(theta)*r, y: Math.sin(theta)*r, type: 'dot' };
+    },
+    spiral: function(i, n) {
+        const t = (i/n) * 8 * Math.PI;
+        const r = (t / (8*Math.PI)) * 0.7;
+        return { x: Math.cos(t)*r, y: Math.sin(t)*r, type: 'dot', r: 1+r*2 };
+    },
+    lissajous: function(i, n) {
+        const t = (i/n) * 2 * Math.PI;
+        return { x: Math.sin(3*t) * 0.65, y: Math.sin(4*t) * 0.65, type: 'dot' };
+    },
+    star: function(i, n) {
+        const t = (i/n) * 2 * Math.PI;
+        const r = 0.4 + 0.2 * Math.cos(5*t);
+        return { x: Math.cos(t)*r, y: Math.sin(t)*r, type: 'dot' };
+    }
+};
+
+// Initialize
+function init() {
+    renderDots();
+    loadLesson(0);
+    renderGal();
+    setupInputs();
+    render();
+}
+
+function setupInputs() {
+    document.querySelectorAll('.eq-inp').forEach(function(inp) {
+        inp.addEventListener('input', function() {
+            updEq();
+            render();
+        });
+    });
+}
+
+// View switching
+function switchView(v) {
+    S.view = v;
+    document.querySelectorAll('.nav-tab').forEach(function(t, i) {
+        t.classList.toggle('active', (v==='learn' && i===0) || (v==='create' && i===1) || (v==='explore' && i===2));
+    });
+    document.querySelectorAll('.view').forEach(function(el) {
+        el.classList.remove('active');
+    });
+    document.getElementById('view-' + v).classList.add('active');
+    
+    if (v === 'learn') {
+        loadLesson(S.lesson);
+    } else if (v === 'create') {
+        updEq();
+    } else if (v === 'explore') {
+        renderGal();
+    }
+    render();
+}
+
+// Learn functions
+function renderDots() {
+    const html = lessons.map(function(_, i) {
+        let cls = '';
+        if (S.done.indexOf(i) !== -1) cls = 'done';
+        if (i === S.lesson) cls = 'now';
+        return '<div class="lesson-dot ' + cls + '" onclick="loadLesson(' + i + ')">' + (i+1) + '</div>';
+    }).join('');
+    document.getElementById('lesson-dots').innerHTML = html;
+}
+
+function loadLesson(idx) {
+    S.lesson = idx;
+    const L = lessons[idx];
+    S.calc = L.fn;
+    S.dp = {};
+    
+    document.getElementById('prog-txt').textContent = 'Lección ' + (idx+1) + '/' + lessons.length;
+    document.getElementById('prog-fill').style.width = ((idx+1) / lessons.length * 100) + '%';
+    
+    renderDots();
+    
+    const ltrs = ['A', 'B', 'C', 'D'];
+    const quizHtml = L.quiz.o.map(function(o, i) {
+        return '<button class="quiz-opt" onclick="checkQ(' + i + ',' + L.quiz.a + ')"><span class="ltr">' + ltrs[i] + '</span>' + o + '</button>';
+    }).join('');
+    
+    document.getElementById('lesson-content').innerHTML = 
+        '<div class="lesson-card fade-in">' +
+            '<div class="lesson-head">' +
+                '<div class="lesson-icon ' + L.cls + '">' + L.icon + '</div>' +
+                '<div class="lesson-info"><h3>' + L.title + '</h3><p>' + L.sub + '</p></div>' +
+            '</div>' +
+            '<div class="lesson-body">' +
+                '<div class="lesson-text">' + L.txt + '</div>' +
+                '<div class="math-box" id="lmath"></div>' +
+                '<div class="demo-box">' +
+                    '<div class="demo-label">🎮 Experimenta</div>' +
+                    '<canvas class="demo-canvas" id="demo-c" width="320" height="90"></canvas>' +
+                    '<div class="demo-ctrl" id="demo-ctrl"></div>' +
+                '</div>' +
+                '<div class="quiz-box">' +
+                    '<div class="quiz-label">📝 Pregunta</div>' +
+                    '<div class="quiz-q">' + L.quiz.q + '</div>' +
+                    '<div class="quiz-opts" id="quiz-opts">' + quizHtml + '</div>' +
+                    '<div class="quiz-fb" id="quiz-fb"></div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="lesson-btns">' +
+                '<button class="btn btn-secondary" onclick="prevL()"' + (idx===0 ? ' disabled' : '') + '>← Anterior</button>' +
+                '<button class="btn btn-primary" onclick="nextL()">' + (idx===lessons.length-1 ? '🎉 Completar' : 'Siguiente →') + '</button>' +
+            '</div>' +
+        '</div>';
+    
+    try {
+        katex.render(L.math, document.getElementById('lmath'), { displayMode: true, throwOnError: false });
+    } catch(e) {}
+    
+    setupDemo(L.demo);
+    renderDemo();
+    render();
+}
+
+function setupDemo(type) {
+    const c = document.getElementById('demo-ctrl');
+    if (!c) return;
+    
+    if (type === 't') {
+        S.dp.demoT = 1;
+        c.innerHTML = '<label>t =</label><input type="range" min="0" max="1" step="0.01" value="1" oninput="updateDemoT(this.value)"><span class="val" id="dv-t">1.00</span>';
+    } else if (type === 'f') {
+        S.dp.freq = 5;
+        c.innerHTML = '<label>k =</label><input type="range" min="2" max="10" value="5" oninput="updateDemoF(this.value)"><span class="val" id="dv-f">5</span>';
+    } else if (type === 'p') {
+        S.dp.power = 1;
+        c.innerHTML = '<label>n =</label><input type="range" min="1" max="9" step="2" value="1" oninput="updateDemoP(this.value)"><span class="val" id="dv-p">1</span>';
+    } else {
+        c.innerHTML = '<span style="color:var(--text-dim)">Observa el canvas principal →</span>';
+    }
+}
+
+function updateDemoT(v) { S.dp.demoT = parseFloat(v); document.getElementById('dv-t').textContent = v; renderDemo(); render(); }
+function updateDemoF(v) { S.dp.freq = parseInt(v); document.getElementById('dv-f').textContent = v; renderDemo(); render(); }
+function updateDemoP(v) { S.dp.power = parseInt(v); document.getElementById('dv-p').textContent = v; renderDemo(); render(); }
+
+function renderDemo() {
+    const c = document.getElementById('demo-c');
+    if (!c) return;
+    const x = c.getContext('2d');
+    const w = c.width, h = c.height;
+    
+    x.fillStyle = '#0c0c1a';
+    x.fillRect(0, 0, w, h);
+    
+    const L = lessons[S.lesson];
+    
+    if (L.demo === 't') {
+        const t = S.dp.demoT !== undefined ? S.dp.demoT : 1;
+        x.strokeStyle = '#1e1e40';
+        x.lineWidth = 1;
+        x.beginPath();
+        x.arc(w/2, h/2, 30, 0, Math.PI*2);
+        x.stroke();
+        
+        x.strokeStyle = '#818cf8';
+        x.lineWidth = 3;
+        x.beginPath();
+        x.arc(w/2, h/2, 30, -Math.PI/2, t*Math.PI*2 - Math.PI/2);
+        x.stroke();
+        
+        const px = w/2 + Math.cos(t*Math.PI*2 - Math.PI/2) * 30;
+        const py = h/2 + Math.sin(t*Math.PI*2 - Math.PI/2) * 30;
+        x.fillStyle = '#4ade80';
+        x.beginPath();
+        x.arc(px, py, 5, 0, Math.PI*2);
+        x.fill();
+        
+    } else if (L.demo === 'sc') {
+        x.lineWidth = 2;
+        x.strokeStyle = '#fb923c';
+        x.beginPath();
+        for (let i = 0; i <= w; i++) {
+            const t = (i/w) * 2 * Math.PI;
+            const y = h/2 - Math.sin(t) * 28;
+            i === 0 ? x.moveTo(i, y) : x.lineTo(i, y);
+        }
+        x.stroke();
+        
+        x.strokeStyle = '#22d3ee';
+        x.beginPath();
+        for (let i = 0; i <= w; i++) {
+            const t = (i/w) * 2 * Math.PI;
+            const y = h/2 - Math.cos(t) * 28;
+            i === 0 ? x.moveTo(i, y) : x.lineTo(i, y);
+        }
+        x.stroke();
+        
+    } else if (L.demo === 'f') {
+        const k = S.dp.freq || 5;
+        x.strokeStyle = '#22d3ee';
+        x.lineWidth = 2;
+        x.beginPath();
+        for (let i = 0; i <= w; i++) {
+            const t = (i/w) * 2 * Math.PI;
+            const y = h/2 - Math.cos(k*t) * 32;
+            i === 0 ? x.moveTo(i, y) : x.lineTo(i, y);
+        }
+        x.stroke();
+        
+    } else if (L.demo === 'p') {
+        const pw = S.dp.power || 1;
+        x.strokeStyle = '#4ade80';
+        x.lineWidth = 2;
+        x.beginPath();
+        for (let i = 0; i <= w; i++) {
+            const t = (i/w) * 2 * Math.PI;
+            const y = h/2 - Math.pow(Math.sin(t), pw) * 32;
+            i === 0 ? x.moveTo(i, y) : x.lineTo(i, y);
+        }
+        x.stroke();
+    }
+}
+
+function checkQ(sel, ans) {
+    const opts = document.querySelectorAll('.quiz-opt');
+    const ok = sel === ans;
+    
+    opts.forEach(function(o, i) {
+        o.disabled = true;
+        if (i === ans) o.classList.add('ok');
+        else if (i === sel && !ok) o.classList.add('no');
+    });
+    
+    const fb = document.getElementById('quiz-fb');
+    const L = lessons[S.lesson];
+    fb.innerHTML = ok 
+        ? '<strong>🎉 ¡Correcto!</strong> ' + L.quiz.e 
+        : '<strong>💡 No exactamente.</strong> ' + L.quiz.e;
+    fb.className = 'quiz-fb show ' + (ok ? 'ok' : 'no');
+    
+    if (ok && S.done.indexOf(S.lesson) === -1) {
+        S.done.push(S.lesson);
+        renderDots();
+    }
+}
+
+function nextL() {
+    if (S.lesson < lessons.length - 1) {
+        loadLesson(S.lesson + 1);
+    } else {
+        switchView('create');
+        stat('🎉 ¡Tutorial completado!');
+    }
+}
+
+function prevL() {
+    if (S.lesson > 0) loadLesson(S.lesson - 1);
+}
+
+// Create functions
+function setMode(m) {
+    S.mode = m;
+    document.querySelectorAll('.ed-tab').forEach(function(t) { t.classList.remove('active'); });
+    event.target.classList.add('active');
+    document.getElementById('ed-param').style.display = m === 'param' ? 'block' : 'none';
+    document.getElementById('ed-polar').style.display = m === 'polar' ? 'block' : 'none';
+    document.getElementById('ed-lines').style.display = m === 'lines' ? 'block' : 'none';
+    updEq();
+    render();
+}
+
+function ins(fn) {
+    const a = document.activeElement;
+    if (a && a.classList.contains('eq-inp')) {
+        const s = a.selectionStart, e = a.selectionEnd;
+        a.value = a.value.substring(0, s) + fn + a.value.substring(e);
+        a.focus();
+        const p = fn.indexOf('(') !== -1 && fn.indexOf(',') === -1 ? s + fn.indexOf('(') + 1 : s + fn.length;
+        a.setSelectionRange(p, p);
+        updEq();
+        render();
+    }
+}
+
+function setPar(n, v) {
+    S.p[n] = parseFloat(v);
+    document.getElementById('pv-' + n).textContent = v;
+    render();
+}
+
+function setSty(st, el) {
+    S.style = st;
+    document.querySelectorAll('.sty-item').forEach(function(s) { s.classList.remove('active'); });
+    el.classList.add('active');
+    render();
+}
+
+function updClr() {
+    S.stroke = document.getElementById('clr-stroke').value;
+    S.bg = document.getElementById('clr-bg').value;
+    render();
+}
+
+function updEq() {
+    const err = document.getElementById('eq-err');
+    if (err) err.classList.remove('show');
+    
+    try {
+        if (S.mode === 'param') {
+            const ex = document.getElementById('eq-x').value;
+            const ey = document.getElementById('eq-y').value;
+            S.calc = buildFn(ex, ey, 'param');
+        } else if (S.mode === 'polar') {
+            const er = document.getElementById('eq-r').value;
+            S.calc = buildFn(er, null, 'polar');
+        } else {
+            const e1 = document.getElementById('eq-x1').value;
+            const e2 = document.getElementById('eq-y1').value;
+            const e3 = document.getElementById('eq-x2').value;
+            const e4 = document.getElementById('eq-y2').value;
+            S.calc = buildFn(e1, e2, 'lines', e3, e4);
+        }
+    } catch(e) {
+        if (err) {
+            err.textContent = '⚠️ ' + e.message;
+            err.classList.add('show');
+        }
+    }
+}
+
+function buildFn(a, b, m, c, d) {
+    function safe(e) {
+        return e
+            .replace(/\^/g, '**')
+            .replace(/PI/g, 'Math.PI')
+            .replace(/sin/g, 'Math.sin')
+            .replace(/cos/g, 'Math.cos')
+            .replace(/tan/g, 'Math.tan')
+            .replace(/sqrt/g, 'Math.sqrt')
+            .replace(/abs/g, 'Math.abs')
+            .replace(/exp/g, 'Math.exp')
+            .replace(/pow/g, 'Math.pow')
+            .replace(/\ba\b/g, 'p.a')
+            .replace(/\bb\b/g, 'p.b')
+            .replace(/\bk\b/g, 'p.k')
+            .replace(/\bamp\b/g, 'p.amp')
+            .replace(/\btheta\b/g, 't');
+    }
+    
+    if (m === 'param') {
+        return new Function('i', 'n', 'p', 
+            'var t = (i/n) * 2 * Math.PI;' +
+            'try { return { x: (' + safe(a) + ') * 0.65, y: (' + safe(b) + ') * 0.65, type: "dot" }; }' +
+            'catch(e) { return { x: 0, y: 0, type: "dot" }; }'
+        );
+    } else if (m === 'polar') {
+        return new Function('i', 'n', 'p',
+            'var t = (i/n) * 2 * Math.PI * Math.max(p.k, 1);' +
+            'try { var r = (' + safe(a) + ') * 0.65; return { x: Math.cos(t)*r, y: Math.sin(t)*r, type: "dot" }; }' +
+            'catch(e) { return { x: 0, y: 0, type: "dot" }; }'
+        );
+    } else {
+        return new Function('i', 'n', 'p',
+            'var t = i/n;' +
+            'try { return { x1: ' + safe(a) + ', y1: ' + safe(b) + ', x2: ' + safe(c) + ', y2: ' + safe(d) + ', type: "line" }; }' +
+            'catch(e) { return { x1: 0, y1: 0, x2: 0, y2: 0, type: "line" }; }'
+        );
+    }
+}
+
+function applyEq() {
+    updEq();
+    render();
+    stat('✨ Ecuación aplicada');
+}
+
+// Explore functions
+function renderGal() {
+    const filtered = S.cat === 'all' ? gallery : gallery.filter(function(g) { return g.cat === S.cat; });
+    
+    const html = filtered.map(function(g) {
+        return '<div class="gal-item' + (S.galActive === g.id ? ' active' : '') + '" onclick="loadGal(\'' + g.id + '\')" id="gal-' + g.id + '">' +
+            '<div class="gal-thumb"><canvas id="th-' + g.id + '" width="130" height="130"></canvas></div>' +
+            '<div class="gal-info"><div class="gal-name">' + g.name + '</div><div class="gal-meta">' + g.desc + '</div></div>' +
+        '</div>';
+    }).join('');
+    
+    document.getElementById('gallery').innerHTML = html;
+    
+    setTimeout(function() {
+        filtered.forEach(function(g) {
+            const c = document.getElementById('th-' + g.id);
+            if (c && galFn[g.id]) renderThumb(c, galFn[g.id]);
+        });
+    }, 50);
+}
+
+function renderThumb(c, fn) {
+    const x = c.getContext('2d');
+    const w = c.width, h = c.height;
+    const sc = w * 0.38;
+    
+    x.fillStyle = '#0a0a14';
+    x.fillRect(0, 0, w, h);
+    
+    x.strokeStyle = '#818cf8';
+    x.fillStyle = '#818cf8';
+    x.lineWidth = 1;
+    
+    for (let i = 0; i < 300; i++) {
+        const d = fn(i, 300, S.p);
+        if (d.type === 'line') {
+            x.beginPath();
+            x.moveTo(w/2 + d.x1*sc, h/2 - d.y1*sc);
+            x.lineTo(w/2 + d.x2*sc, h/2 - d.y2*sc);
+            x.stroke();
+        } else {
+            x.beginPath();
+            x.arc(w/2 + d.x*sc, h/2 - d.y*sc, d.r || 1, 0, Math.PI*2);
+            x.fill();
+        }
+    }
+}
+
+function loadGal(id) {
+    S.calc = galFn[id];
+    S.galActive = id;
+    
+    document.querySelectorAll('.gal-item').forEach(function(e) { e.classList.remove('active'); });
+    var el = document.getElementById('gal-' + id);
+    if (el) el.classList.add('active');
+    
+    var item = gallery.find(function(g) { return g.id === id; });
+    stat('Cargado: ' + (item ? item.name : id));
+    render();
+}
+
+function setCat(c, el) {
+    S.cat = c;
+    document.querySelectorAll('.cat-tab').forEach(function(t) { t.classList.remove('active'); });
+    el.classList.add('active');
+    renderGal();
+}
+
+function filterGal(term) {
+    document.querySelectorAll('.gal-item').forEach(function(item) {
+        var name = item.querySelector('.gal-name').textContent.toLowerCase();
+        item.style.display = name.indexOf(term.toLowerCase()) !== -1 ? 'block' : 'none';
+    });
+}
+
+function randomize() {
+    var freqA = Math.floor(Math.random() * 8) + 2;
+    var freqB = Math.floor(Math.random() * 8) + 2;
+    var powers = [1, 2, 3, 5, 7];
+    var pw = powers[Math.floor(Math.random() * powers.length)];
+    
+    var templates = [
+        ['Math.pow(Math.sin(' + freqA + '*t),' + pw + ')', 'Math.pow(Math.cos(' + freqB + '*t),' + pw + ')'],
+        ['Math.sin(' + freqA + '*t)*Math.cos(' + freqB + '*t)', 'Math.sin(' + freqA + '*t)*Math.sin(' + freqB + '*t)'],
+        ['Math.cos(' + freqA + '*t)*Math.pow(Math.sin(' + freqB + '*t),' + pw + ')', 'Math.sin(' + freqA + '*t)*Math.pow(Math.cos(' + freqB + '*t),' + pw + ')']
+    ];
+    
+    var sel = templates[Math.floor(Math.random() * templates.length)];
+    var xEq = sel[0];
+    var yEq = sel[1];
+    
+    S.calc = function(i, n) {
+        var t = (i/n) * 2 * Math.PI;
+        try {
+            return {
+                x: eval(xEq) * 0.6,
+                y: eval(yEq) * 0.6,
+                type: 'dot'
+            };
+        } catch(e) {
+            return { x: 0, y: 0, type: 'dot' };
+        }
+    };
+    
+    var displayX = xEq.replace(/Math\./g, '').replace(/\*/g, '·');
+    var displayY = yEq.replace(/Math\./g, '').replace(/\*/g, '·');
+    
+    document.getElementById('rnd-res').classList.add('show');
+    document.getElementById('rnd-res').innerHTML = 
+        '<div class="rnd-row"><span class="n">X(t)</span><span class="v">' + displayX + '</span></div>' +
+        '<div class="rnd-row"><span class="n">Y(t)</span><span class="v">' + displayY + '</span></div>';
+    
+    S.galActive = null;
+    document.querySelectorAll('.gal-item').forEach(function(e) { e.classList.remove('active'); });
+    
+    stat('🎲 Generado aleatoriamente');
+    render();
+}
+
+function copyEq() {
+    var r = document.getElementById('rnd-res');
+    if (r.classList.contains('show')) {
+        navigator.clipboard.writeText(r.innerText);
+        stat('📋 Ecuación copiada');
+    }
+}
+
+// Main render
+function render() {
+    var w = canvas.width;
+    var h = canvas.height;
+    var scale = Math.min(w, h) * 0.42;
+    var cx = w / 2;
+    var cy = h / 2;
+    
+    ctx.fillStyle = S.bg;
+    ctx.fillRect(0, 0, w, h);
+    
+    if (S.guide) {
+        ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, cy);
+        ctx.lineTo(w, cy);
+        ctx.moveTo(cx, 0);
+        ctx.lineTo(cx, h);
+        ctx.stroke();
+        
+        ctx.setLineDash([3, 3]);
+        [0.25, 0.5, 0.75, 1].forEach(function(r) {
+            ctx.beginPath();
+            ctx.arc(cx, cy, scale * r, 0, Math.PI * 2);
+            ctx.stroke();
+        });
+        ctx.setLineDash([]);
+    }
+    
+    if (!S.calc) return;
+    
+    var dn = Math.floor(S.n * S.buildProg);
+    
+    if (S.style === 'line') ctx.beginPath();
+    
+    for (var i = 0; i < dn; i++) {
+        var d;
+        try {
+            d = S.calc(i, S.n, Object.assign({}, S.p, S.dp, { time: S.time }));
+        } catch(e) {
+            continue;
+        }
+        
+        var clr = S.stroke;
+        if (S.rainbow) {
+            var hu = ((i / S.n) * 360 + S.time * 60) % 360;
+            clr = 'hsl(' + hu + ', 75%, 62%)';
+        }
+        
+        ctx.strokeStyle = clr;
+        ctx.fillStyle = clr;
+        ctx.lineWidth = 1.2;
+        
+        if (d.type === 'line') {
+            ctx.beginPath();
+            ctx.moveTo(cx + d.x1 * scale, cy - d.y1 * scale);
+            ctx.lineTo(cx + d.x2 * scale, cy - d.y2 * scale);
+            ctx.stroke();
+        } else {
+            var x = cx + d.x * scale;
+            var y = cy - d.y * scale;
+            var r = d.r || 2;
+            
+            if (S.style === 'dots') {
+                ctx.beginPath();
+                ctx.arc(x, y, r, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (S.style === 'line') {
+                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            } else if (S.style === 'circ') {
+                ctx.beginPath();
+                ctx.arc(x, y, r + 1.5, 0, Math.PI * 2);
+                ctx.stroke();
+            } else if (S.style === 'seg' && i > 0) {
+                try {
+                    var p = S.calc(i - 1, S.n, Object.assign({}, S.p, S.dp));
+                    ctx.beginPath();
+                    ctx.moveTo(cx + p.x * scale, cy - p.y * scale);
+                    ctx.lineTo(x, y);
+                    ctx.stroke();
+                } catch(e) {}
+            }
+        }
+    }
+    
+    if (S.style === 'line') {
+        ctx.strokeStyle = S.rainbow ? '#818cf8' : S.stroke;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+    }
+    
+    if (S.buildProg < 1 && dn > 0) {
+        try {
+            var last = S.calc(dn - 1, S.n, Object.assign({}, S.p, S.dp));
+            var px = last.type === 'line' ? last.x2 : last.x;
+            var py = last.type === 'line' ? last.y2 : last.y;
+            
+            ctx.fillStyle = '#4ade80';
+            ctx.beginPath();
+            ctx.arc(cx + px * scale, cy - py * scale, 5, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.font = '11px monospace';
+            ctx.fillText('t=' + (dn / S.n).toFixed(3), cx + px * scale + 8, cy - py * scale - 6);
+        } catch(e) {}
+    }
+}
+
+// Controls
+function setN(v) {
+    S.n = parseInt(v);
+    document.getElementById('val-n').textContent = v;
+    render();
+}
+
+function toggleAnim() {
+    S.anim = !S.anim;
+    var b = document.getElementById('btn-anim');
+    b.classList.toggle('active', S.anim);
+    b.innerHTML = S.anim ? '⏸ Pausar' : '▶ Animar';
+    
+    if (S.anim) {
+        stat('🔄 Animando...');
+        animLoop();
+    } else {
+        cancelAnimationFrame(animId);
+        stat('⏸ Pausado');
+    }
+}
+
+function animLoop() {
+    if (!S.anim) return;
+    S.time += 0.02;
+    render();
+    animId = requestAnimationFrame(animLoop);
+}
+
+function toggleGuide() {
+    S.guide = !S.guide;
+    document.getElementById('btn-guide').classList.toggle('active', S.guide);
+    render();
+}
+
+function toggleRainbow() {
+    S.rainbow = !S.rainbow;
+    document.getElementById('btn-rainbow').classList.toggle('active', S.rainbow);
+    render();
+}
+
+function toggleBuild() {
+    S.building = !S.building;
+    document.getElementById('btn-build').classList.toggle('active', S.building);
+    
+    if (S.building) {
+        S.buildProg = 0;
+        stat('🔨 Construyendo...');
+        buildLoop();
+    } else {
+        cancelAnimationFrame(buildId);
+        S.buildProg = 1;
+        render();
+    }
+}
+
+function buildLoop() {
+    if (!S.building) return;
+    S.buildProg += 0.005;
+    if (S.buildProg >= 1) {
+        S.buildProg = 1;
+        S.building = false;
+        document.getElementById('btn-build').classList.remove('active');
+        stat('✅ Construcción completa');
+    }
+    render();
+    if (S.building) buildId = requestAnimationFrame(buildLoop);
+}
+
+function resetCanvas() {
+    S.buildProg = 1;
+    S.time = 0;
+    S.anim = false;
+    S.building = false;
+    cancelAnimationFrame(animId);
+    cancelAnimationFrame(buildId);
+    document.getElementById('btn-anim').classList.remove('active');
+    document.getElementById('btn-anim').innerHTML = '▶ Animar';
+    document.getElementById('btn-build').classList.remove('active');
+    stat('🔄 Limpiado');
+    render();
+}
+
+function resetAll() {
+    resetCanvas();
+    S.rainbow = false;
+    S.guide = false;
+    document.getElementById('btn-rainbow').classList.remove('active');
+    document.getElementById('btn-guide').classList.remove('active');
+    if (S.view === 'learn') loadLesson(S.lesson);
+}
+
+function exportPNG() {
+    var a = document.createElement('a');
+    a.download = 'mathart-' + Date.now() + '.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+    stat('💾 Imagen guardada');
+}
+
+function stat(m) {
+    document.getElementById('status').textContent = m;
+}
+
+// Start
+init();
+</script>
+</body>
 </html>
