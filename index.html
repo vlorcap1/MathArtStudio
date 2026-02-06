@@ -39,14 +39,18 @@
 
         .app {
             display: grid;
-            grid-template-rows: 52px 1fr 36px;
+            grid-template-rows: 52px 1fr 40px;
             grid-template-columns: 1fr 380px;
+            grid-template-areas:
+                "header header"
+                "main sidebar"
+                "footer footer";
             height: 100vh;
             overflow: hidden;
         }
 
         header {
-            grid-column: 1 / -1;
+            grid-area: header;
             background: var(--bg-card);
             border-bottom: 1px solid var(--border);
             padding: 0 16px;
@@ -85,6 +89,7 @@
         .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
 
         .main-area {
+            grid-area: main;
             background: linear-gradient(180deg, var(--bg) 0%, #080812 100%);
             display: flex; flex-direction: column; position: relative;
         }
@@ -132,15 +137,21 @@
         .tool-slider .val { color: var(--accent); min-width: 28px; font-family: monospace; }
 
         footer {
-            grid-column: 1 / -1; background: var(--bg-card);
-            border-top: 1px solid var(--border); padding: 0 16px;
-            display: flex; align-items: center; justify-content: space-between;
-            font-size: 0.7rem; color: var(--text-dim);
+            grid-area: footer;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border); 
+            padding: 0 16px;
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
+            font-size: 0.72rem; 
+            color: var(--text-dim);
         }
         footer a { color: var(--accent); text-decoration: none; }
         footer a:hover { text-decoration: underline; }
 
         .side-panel {
+            grid-area: sidebar;
             background: var(--bg-card); border-left: 1px solid var(--border);
             display: flex; flex-direction: column;
             overflow: hidden;
